@@ -4,7 +4,7 @@
       Tasks
       <b-tag type="is-info">{{ taskLength }}</b-tag>
       <b-button class="is-pulled-right is-small" rounded @click="addToDo()">
-        <b-icon icon="close-circle-outline" size="is-small"></b-icon>
+        <b-icon icon="plus" size="is-small"></b-icon>
       </b-button>
     </p>
     <ToDo
