@@ -4,7 +4,9 @@
       Tasks
       <b-tag type="is-info">{{ taskLength }}</b-tag>
       <b-button class="is-pulled-right is-small" rounded @click="addToDo()">
-        <b-icon icon="plus" size="is-small"></b-icon>
+        <b-tooltip label="Add new task">
+          <b-icon icon="plus" size="is-small"></b-icon>
+        </b-tooltip>
       </b-button>
     </p>
     <ToDo
@@ -22,14 +24,14 @@ import ToDo from "./ToDo.vue";
 export default {
   data() {
     return {
-      tasks: []
+      tasks: [],
     };
   },
   mounted() {
     this.axios
       .get("https://jsonplaceholder.typicode.com/todos?userId=1")
-      .then(response => {
-        [...response.data].forEach(data => {
+      .then((response) => {
+        [...response.data].forEach((data) => {
           this.addToDo(data.title);
         });
       });
@@ -38,23 +40,23 @@ export default {
     addToDo(title) {
       this.tasks.unshift({
         id: this.tasks.length,
-        title: title
+        title: title,
       });
-    }
+    },
   },
   computed: {
     taskLength() {
       return this.tasks.length;
-    }
+    },
   },
   beforeCreate() {
-    Event.listener("removeTask", id => {
-      this.tasks = this.tasks.filter(item => {
+    Event.listener("removeTask", (id) => {
+      this.tasks = this.tasks.filter((item) => {
         return item.id != id;
       });
     });
-    Event.listener("changeText", data => {
-      this.tasks.map(item => {
+    Event.listener("changeText", (data) => {
+      this.tasks.map((item) => {
         if (data.id === item.id) {
           item.title = data.title;
         }
@@ -62,8 +64,8 @@ export default {
     });
   },
   components: {
-    ToDo
-  }
+    ToDo,
+  },
 };
 </script>
 
