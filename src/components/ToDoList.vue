@@ -1,21 +1,24 @@
 <template>
-  <div class="panel" id="ToDoList">
-    <p class="panel-heading">
-      Tasks
-      <b-tag type="is-info">{{ taskLength }}</b-tag>
+  <article class="message" id="ToDoList">
+    <div class="message-header">
+      <p>
+        Tasks <b-tag type="is-info">{{ taskLength }}</b-tag>
+      </p>
       <b-button class="is-pulled-right is-small" rounded @click="addToDo()">
         <b-tooltip label="Add new task">
           <b-icon icon="plus" size="is-small"></b-icon>
         </b-tooltip>
       </b-button>
-    </p>
-    <ToDo
-      v-for="task in tasks"
-      :key="task.id"
-      :id-task="task.id"
-      :title-task="task.title"
-    ></ToDo>
-  </div>
+    </div>
+    <div class="message-body">
+      <ToDo
+        v-for="task in tasks"
+        :key="task.id"
+        :id-task="task.id"
+        :title-task="task.title"
+      ></ToDo>
+    </div>
+  </article>
 </template>
 
 <script>
