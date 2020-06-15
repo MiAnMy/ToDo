@@ -4,27 +4,24 @@
       <p>
         Tasks <b-tag type="is-info">{{ taskLength }}</b-tag>
       </p>
-      <b-button class="is-pulled-right is-small" rounded @click="addToDo()">
+      <b-button class="is-pulled-right is-small" rounded @click="addNewToDo">
         <b-tooltip label="Add new task">
           <b-icon icon="plus" size="is-small"></b-icon>
         </b-tooltip>
       </b-button>
     </div>
     <div class="message-body">
-      <ToDo
-        v-for="task in tasks"
-        :key="task.id"
-        :id-task="task.id"
-        :title-task="task.title"
-      ></ToDo>
+      <ToDo v-for="task in tasks" :key="task.id" :task="task"></ToDo>
     </div>
   </article>
 </template>
 
 <script>
+import notifiMixin from "../mixins/notifiMixin";
 import ToDo from "./ToDo.vue";
 
 export default {
+  mixins: [notifiMixin],
   data() {
     return {
       tasks: [],
@@ -34,16 +31,25 @@ export default {
     this.axios
       .get("https://jsonplaceholder.typicode.com/todos?userId=1")
       .then((response) => {
-        [...response.data].forEach((data) => {
-          this.addToDo(data.title);
+        [...response.data].forEach((task) => {
+          this.addToDo(task);
         });
       });
   },
   methods: {
-    addToDo(title) {
+    addNewToDo() {
+      this.axios
+        .post("https://jsonplaceholder.typicode.com/todos")
+        .then((res) => {
+          this.addToDo(res.data);
+          this.createNotification("Created new task", "is-light");
+        });
+    },
+    addToDo(task) {
       this.tasks.unshift({
         id: this.tasks.length,
-        title: title,
+        title: task?.title,
+        completed: task?.completed,
       });
     },
   },
@@ -54,16 +60,7 @@ export default {
   },
   beforeCreate() {
     Event.listener("removeTask", (id) => {
-      this.tasks = this.tasks.filter((item) => {
-        return item.id != id;
-      });
-    });
-    Event.listener("changeText", (data) => {
-      this.tasks.map((item) => {
-        if (data.id === item.id) {
-          item.title = data.title;
-        }
-      });
+      this.tasks = this.tasks.filter((task) => task.id != id);
     });
   },
   components: {

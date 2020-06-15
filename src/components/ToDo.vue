@@ -1,5 +1,8 @@
 <template>
-  <b-field id="ToDo" :type="isDone ? 'has-text-success' : 'has-text-primary'">
+  <b-field
+    id="ToDo"
+    :type="task.completed ? 'has-text-success' : 'has-text-primary'"
+  >
     <p class="control">
       <b-button type="is-dark" @click="disableItem">
         <b-tooltip label="Unlock" v-if="isDisable">
@@ -10,16 +13,23 @@
         </b-tooltip>
       </b-button>
     </p>
+    <p class="control">
+      <b-button type="is-success" @click="updateItem" :loading="loading">
+        <b-tooltip label="update task">
+          <b-icon icon="update"></b-icon>
+        </b-tooltip>
+      </b-button>
+    </p>
     <b-input
       placeholder="To do..."
-      :value="titleTask"
+      :value="task.title"
       :disabled="isDisable === true"
-      @change="updateItem($event.target.value)"
+      v-model="title"
       expanded
     ></b-input>
     <p class="control">
-      <b-button type="is-primary" @click="taskDone">
-        <b-tooltip label="Undone" v-if="isDone">
+      <b-button type="is-primary" @click="taskDone" :loading="loading">
+        <b-tooltip label="Undone" v-if="task.completed">
           <b-icon icon="close-circle-outline"></b-icon>
         </b-tooltip>
         <b-tooltip label="Done" v-else>
@@ -30,6 +40,7 @@
     <p class="control">
       <b-button
         type="is-danger"
+        :loading="loading"
         @click="removeItem"
         :disabled="isDisable === true"
       >
@@ -41,36 +52,69 @@
 </template>
 
 <script>
+import notifiMixin from "../mixins/notifiMixin";
+
 export default {
+  mixins: [notifiMixin],
   props: {
-    idTask: {
-      type: Number,
-      require: true,
-    },
-    titleTask: {
-      type: String,
+    task: {
+      type: Object,
+      required: true,
     },
   },
   data() {
     return {
-      isDone: false,
       isDisable: false,
+      title: this.task.title,
+      loading: false,
     };
   },
   methods: {
-    taskDone() {
-      this.isDone = !this.isDone;
-    },
-    removeItem() {
-      this.$destroy();
-      this.$el.parentNode.removeChild(this.$el);
-      Event.fire("removeTask", this.idTask);
-    },
     disableItem() {
       this.isDisable = !this.isDisable;
     },
-    updateItem(title) {
-      Event.fire("changeText", { id: this.idTask, title });
+    isLoading() {
+      this.loading = !this.loading;
+    },
+    taskDone() {
+      this.loading = true;
+      this.axios
+        .patch(`https://jsonplaceholder.typicode.com/todos/${this.task.id}`, {
+          completed: !this.task.completed,
+        })
+        .then((res) => {
+          window.console.log(res);
+          const msg = !this.task.completed ? "Task done" : "Task undone";
+          this.createNotification(msg, "is-primary");
+          this.task.completed = !this.task.completed;
+        })
+        .catch((err) => window.console.error(err))
+        .finally(() => (this.loading = false));
+    },
+    updateItem() {
+      this.loading = true;
+      this.axios
+        .patch(`https://jsonplaceholder.typicode.com/todos/${this.task.id}`, {
+          title: this.title,
+        })
+        .then((res) => {
+          window.console.log(res);
+          this.createNotification("Task updated", "is-success");
+        })
+        .catch((err) => window.console.error(err))
+        .finally(() => (this.loading = false));
+    },
+    removeItem() {
+      this.loading = true;
+      this.axios
+        .delete(`https://jsonplaceholder.typicode.com/todos/${this.task.id}`)
+        .then((res) => {
+          window.console.log(res);
+          Event.fire("removeTask", this.task.id);
+          this.createNotification("Task deleted", "is-danger");
+        })
+        .catch((err) => window.console.error(err))
+        .finally(() => (this.loading = false));
     },
   },
 };
