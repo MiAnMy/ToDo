@@ -5,7 +5,7 @@
         Tasks <b-tag type="is-info">{{ taskLength }}</b-tag>
       </p>
       <b-button class="is-pulled-right is-small" rounded @click="addNewToDo">
-        <b-tooltip label="Add new task">
+        <b-tooltip label="Add new task" type="is-light">
           <b-icon icon="plus" size="is-small"></b-icon>
         </b-tooltip>
       </b-button>

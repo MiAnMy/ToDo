@@ -5,17 +5,17 @@
   >
     <p class="control">
       <b-button type="is-dark" @click="disableItem">
-        <b-tooltip label="Unlock" v-if="isDisable">
+        <b-tooltip label="Unlock" type="is-dark" v-if="isDisable">
           <b-icon icon="lock-outline"></b-icon>
         </b-tooltip>
-        <b-tooltip label="Lock" v-else>
+        <b-tooltip label="Lock" type="is-dark" v-else>
           <b-icon icon="lock-open-outline"></b-icon>
         </b-tooltip>
       </b-button>
     </p>
     <p class="control">
       <b-button type="is-success" @click="updateItem" :loading="loading">
-        <b-tooltip label="update task">
+        <b-tooltip label="update task" type="is-success">
           <b-icon icon="update"></b-icon>
         </b-tooltip>
       </b-button>
@@ -29,7 +29,7 @@
     ></b-input>
     <p class="control">
       <b-button type="is-primary" @click="taskDone" :loading="loading">
-        <b-tooltip label="Undone" v-if="task.completed">
+        <b-tooltip label="Undone" type="is-primary" v-if="task.completed">
           <b-icon icon="close-circle-outline"></b-icon>
         </b-tooltip>
         <b-tooltip label="Done" v-else>
@@ -44,7 +44,7 @@
         @click="removeItem"
         :disabled="isDisable === true"
       >
-        <b-tooltip label="Delete">
+        <b-tooltip label="Delete" type="is-danger">
           <b-icon icon="delete-forever"> </b-icon></b-tooltip
       ></b-button>
     </p>
