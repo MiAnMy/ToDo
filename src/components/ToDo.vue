@@ -120,4 +120,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.field.has-addons .control {
+  z-index: 0 !important;
+}
+</style>
