@@ -1,7 +1,4 @@
 const notifiMixin = {
-  data: () => ({
-    isLoading: false,
-  }),
   methods: {
     createNotification(msg, type, clo = false) {
       this.$buefy.notification.open({
@@ -9,6 +6,7 @@ const notifiMixin = {
         type: type,
         closable: clo,
         position: "is-top",
+        queue: false,
       });
     },
   },

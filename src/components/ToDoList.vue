@@ -22,11 +22,13 @@
 </template>
 
 <script>
-import mixin from "../mixins/mixin";
+import notifiMixin from "../mixins/notifiMixin";
+import commonDataMixin from "../mixins/commonMixin";
+
 import ToDo from "./ToDo.vue";
 
 export default {
-  mixins: [mixin],
+  mixins: [notifiMixin, commonDataMixin],
   data() {
     return {
       tasks: [],
@@ -39,18 +41,22 @@ export default {
         [...response.data].forEach((task) => {
           this.addToDo(task);
         });
-      });
+      })
+      .catch((err) => window.console.error(err));
   },
   methods: {
     addNewToDo() {
-      this.isLoading = true;
+      this.toggleVarBoolean("isLoading");
       this.axios
         .post("https://jsonplaceholder.typicode.com/todos")
         .then((res) => {
           this.addToDo(res.data);
           this.createNotification("Created new task", "is-light");
         })
-        .finally(() => (this.isLoading = false));
+        .catch((err) => {
+          this.createNotification(err.toString(), "is-black");
+        })
+        .finally(() => this.toggleVarBoolean("isLoading"));
     },
     addToDo(task) {
       this.tasks.unshift({

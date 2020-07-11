@@ -4,7 +4,7 @@
     :type="task.completed ? 'has-text-success' : 'has-text-primary'"
   >
     <p class="control">
-      <b-button type="is-dark" @click="disableItem">
+      <b-button type="is-dark" @click="toggleTodo">
         <b-tooltip label="Unlock" type="is-dark" v-if="isDisable">
           <b-icon icon="lock-outline"></b-icon>
         </b-tooltip>
@@ -40,7 +40,7 @@
     <p class="control">
       <b-button
         type="is-danger"
-        :loading="loading"
+        :loading="isLoading"
         @click="removeItem"
         :disabled="isDisable === true"
       >
@@ -52,10 +52,10 @@
 </template>
 
 <script>
-import mixin from "../mixins/mixin";
-
+import notifiMixin from "../mixins/notifiMixin";
+import commonDataMixin from "../mixins/commonMixin";
 export default {
-  mixins: [mixin],
+  mixins: [notifiMixin, commonDataMixin],
   props: {
     task: {
       type: Object,
@@ -64,31 +64,34 @@ export default {
   },
   data() {
     return {
-      isDisable: false,
       title: this.task.title,
+      isDisable: false,
     };
   },
   methods: {
-    disableItem() {
+    toggleTodo() {
       this.isDisable = !this.isDisable;
     },
     taskDone() {
-      this.isLoading = true;
+      this.toggleVarBoolean("isLoading");
+      this.task.completed = !this.task.completed;
       this.axios
         .patch(`https://jsonplaceholder.typicode.com/todos/${this.task.id}`, {
-          completed: !this.task.completed,
+          completed: this.task.completed,
         })
         .then((res) => {
           window.console.log(res);
-          const msg = !this.task.completed ? "Task done" : "Task undone";
+          const msg = this.task.completed ? `Task done` : "Task undone";
           this.createNotification(msg, "is-primary");
+        })
+        .catch((err) => {
+          this.createNotification(err.toString(), "is-black");
           this.task.completed = !this.task.completed;
         })
-        .catch((err) => window.console.error(err))
-        .finally(() => (this.isLoading = false));
+        .finally(() => this.toggleVarBoolean("isLoading"));
     },
     updateItem() {
-      this.isLoading = true;
+      this.toggleVarBoolean("isLoading");
       this.axios
         .patch(`https://jsonplaceholder.typicode.com/todos/${this.task.id}`, {
           title: this.title,
@@ -97,11 +100,11 @@ export default {
           window.console.log(res);
           this.createNotification("Task updated", "is-success");
         })
-        .catch((err) => window.console.error(err))
-        .finally(() => (this.isLoading = false));
+        .catch((err) => this.createNotification(err.toString(), "is-black"))
+        .finally(() => this.toggleVarBoolean("isLoading"));
     },
     removeItem() {
-      this.isLoading = true;
+      this.toggleVarBoolean("isLoading");
       this.axios
         .delete(`https://jsonplaceholder.typicode.com/todos/${this.task.id}`)
         .then((res) => {
@@ -109,8 +112,8 @@ export default {
           Event.fire("removeTask", this.task.id);
           this.createNotification("Task deleted", "is-danger");
         })
-        .catch((err) => window.console.error(err))
-        .finally(() => (this.isLoading = false));
+        .catch((err) => this.createNotification(err.toString(), "is-black"))
+        .finally(() => this.toggleVarBoolean("isLoading"));
     },
   },
 };
