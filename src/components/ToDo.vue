@@ -54,6 +54,8 @@
 <script>
 import notifiMixin from "../mixins/notifiMixin";
 import commonDataMixin from "../mixins/commonMixin";
+import { axiosPatch, axiosDelete } from "../modules/axios";
+
 export default {
   mixins: [notifiMixin, commonDataMixin],
   props: {
@@ -75,10 +77,9 @@ export default {
     taskDone() {
       this.toggleVarBoolean("isLoading");
       this.task.completed = !this.task.completed;
-      this.axios
-        .patch(`https://jsonplaceholder.typicode.com/todos/${this.task.id}`, {
-          completed: this.task.completed,
-        })
+      axiosPatch(this.task.id, {
+        completed: this.task.completed,
+      })
         .then((res) => {
           window.console.log(res);
           const msg = this.task.completed ? `Task done` : "Task undone";
@@ -92,10 +93,9 @@ export default {
     },
     updateItem() {
       this.toggleVarBoolean("isLoading");
-      this.axios
-        .patch(`https://jsonplaceholder.typicode.com/todos/${this.task.id}`, {
-          title: this.title,
-        })
+      axiosPatch(this.task.id, {
+        title: this.title,
+      })
         .then((res) => {
           window.console.log(res);
           this.createNotification("Task updated", "is-success");
@@ -105,8 +105,7 @@ export default {
     },
     removeItem() {
       this.toggleVarBoolean("isLoading");
-      this.axios
-        .delete(`https://jsonplaceholder.typicode.com/todos/${this.task.id}`)
+      axiosDelete(this.task.id)
         .then((res) => {
           window.console.log(res);
           Event.fire("removeTask", this.task.id);

@@ -24,6 +24,7 @@
 <script>
 import notifiMixin from "../mixins/notifiMixin";
 import commonDataMixin from "../mixins/commonMixin";
+import { axiosPost, axiosGet } from "../modules/axios";
 
 import ToDo from "./ToDo.vue";
 
@@ -35,8 +36,7 @@ export default {
     };
   },
   mounted() {
-    this.axios
-      .get("https://jsonplaceholder.typicode.com/todos?userId=1")
+    axiosGet()
       .then((response) => {
         [...response.data].forEach((task) => {
           this.addToDo(task);
@@ -47,8 +47,7 @@ export default {
   methods: {
     addNewToDo() {
       this.toggleVarBoolean("isLoading");
-      this.axios
-        .post("https://jsonplaceholder.typicode.com/todos")
+      axiosPost()
         .then((res) => {
           this.addToDo(res.data);
           this.createNotification("Created new task", "is-light");
