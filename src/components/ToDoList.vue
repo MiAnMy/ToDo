@@ -4,7 +4,12 @@
       <p>
         Tasks <b-tag type="is-info">{{ taskLength }}</b-tag>
       </p>
-      <b-button class="is-pulled-right is-small" rounded @click="addNewToDo">
+      <b-button
+        class="is-pulled-right is-small"
+        rounded
+        @click="addNewToDo"
+        :loading="isLoading"
+      >
         <b-tooltip label="Add new task" type="is-light">
           <b-icon icon="plus" size="is-small"></b-icon>
         </b-tooltip>
@@ -17,11 +22,11 @@
 </template>
 
 <script>
-import notifiMixin from "../mixins/notifiMixin";
+import mixin from "../mixins/mixin";
 import ToDo from "./ToDo.vue";
 
 export default {
-  mixins: [notifiMixin],
+  mixins: [mixin],
   data() {
     return {
       tasks: [],
@@ -38,12 +43,14 @@ export default {
   },
   methods: {
     addNewToDo() {
+      this.isLoading = true;
       this.axios
         .post("https://jsonplaceholder.typicode.com/todos")
         .then((res) => {
           this.addToDo(res.data);
           this.createNotification("Created new task", "is-light");
-        });
+        })
+        .finally(() => (this.isLoading = false));
     },
     addToDo(task) {
       this.tasks.unshift({

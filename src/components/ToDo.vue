@@ -14,7 +14,7 @@
       </b-button>
     </p>
     <p class="control">
-      <b-button type="is-success" @click="updateItem" :loading="loading">
+      <b-button type="is-success" @click="updateItem" :loading="isLoading">
         <b-tooltip label="update task" type="is-success">
           <b-icon icon="update"></b-icon>
         </b-tooltip>
@@ -28,7 +28,7 @@
       expanded
     ></b-input>
     <p class="control">
-      <b-button type="is-primary" @click="taskDone" :loading="loading">
+      <b-button type="is-primary" @click="taskDone" :loading="isLoading">
         <b-tooltip label="Undone" type="is-primary" v-if="task.completed">
           <b-icon icon="close-circle-outline"></b-icon>
         </b-tooltip>
@@ -52,10 +52,10 @@
 </template>
 
 <script>
-import notifiMixin from "../mixins/notifiMixin";
+import mixin from "../mixins/mixin";
 
 export default {
-  mixins: [notifiMixin],
+  mixins: [mixin],
   props: {
     task: {
       type: Object,
@@ -66,18 +66,14 @@ export default {
     return {
       isDisable: false,
       title: this.task.title,
-      loading: false,
     };
   },
   methods: {
     disableItem() {
       this.isDisable = !this.isDisable;
     },
-    isLoading() {
-      this.loading = !this.loading;
-    },
     taskDone() {
-      this.loading = true;
+      this.isLoading = true;
       this.axios
         .patch(`https://jsonplaceholder.typicode.com/todos/${this.task.id}`, {
           completed: !this.task.completed,
@@ -89,10 +85,10 @@ export default {
           this.task.completed = !this.task.completed;
         })
         .catch((err) => window.console.error(err))
-        .finally(() => (this.loading = false));
+        .finally(() => (this.isLoading = false));
     },
     updateItem() {
-      this.loading = true;
+      this.isLoading = true;
       this.axios
         .patch(`https://jsonplaceholder.typicode.com/todos/${this.task.id}`, {
           title: this.title,
@@ -102,10 +98,10 @@ export default {
           this.createNotification("Task updated", "is-success");
         })
         .catch((err) => window.console.error(err))
-        .finally(() => (this.loading = false));
+        .finally(() => (this.isLoading = false));
     },
     removeItem() {
-      this.loading = true;
+      this.isLoading = true;
       this.axios
         .delete(`https://jsonplaceholder.typicode.com/todos/${this.task.id}`)
         .then((res) => {
@@ -114,7 +110,7 @@ export default {
           this.createNotification("Task deleted", "is-danger");
         })
         .catch((err) => window.console.error(err))
-        .finally(() => (this.loading = false));
+        .finally(() => (this.isLoading = false));
     },
   },
 };
