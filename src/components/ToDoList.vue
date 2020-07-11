@@ -64,16 +64,14 @@ export default {
         completed: task?.completed,
       });
     },
+    removeToDo(id) {
+      this.tasks = this.tasks.filter((task) => task.id != id);
+    },
   },
   computed: {
     taskLength() {
       return this.tasks.length;
     },
-  },
-  beforeCreate() {
-    Event.listener("removeTask", (id) => {
-      this.tasks = this.tasks.filter((task) => task.id != id);
-    });
   },
   components: {
     ToDo,

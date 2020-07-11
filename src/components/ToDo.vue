@@ -108,7 +108,7 @@ export default {
       axiosDelete(this.task.id)
         .then((res) => {
           window.console.log(res);
-          Event.fire("removeTask", this.task.id);
+          this.$parent.removeToDo(this.task.id);
           this.createNotification("Task deleted", "is-danger");
         })
         .catch((err) => this.createNotification(err.toString(), "is-black"))
